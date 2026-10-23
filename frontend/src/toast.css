@@ -1,0 +1,17 @@
+.Toastify__toast-container {
+  z-index: 999999 !important;
+}
+
+.Toastify__toast {
+  border-radius: 12px !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.1) !important;
+}
+
+@media (max-width: 480px) {
+  .Toastify__toast {
+    margin: 8px 16px !important;
+    border-radius: 10px !important;
+  }
+}
