@@ -63,7 +63,7 @@ app.add_middleware(AuthMiddleware)
 
 @app.get("/")
 def home():
-    return PlainTextResponse("Hello World")
+    return {'message' : 'Hello world'}
 
 app.include_router(userRoutes)
 app.include_router(documentRoutes)
