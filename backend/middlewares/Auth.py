@@ -5,12 +5,11 @@ from App.models.database import SessionLocal
 from App.models.user import UserModel
 from services.Auth import getUser
 
-allowedPaths = {'', '/', '/health', '/signup', '/login', '/sendotp', '/docs', '/openapi.json', '/redoc', '/favicon.ico'}
+allowedPaths = {'/', '/signup', '/login', '/sendotp', '/docs', '/openapi.json', '/redoc', '/favicon.ico'}
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        path = request.url.path.rstrip('/')
-        if request.method == "OPTIONS" or request.url.path in allowedPaths or path in allowedPaths or not path:
+        if request.method == "OPTIONS" or request.url.path in allowedPaths:
             return await call_next(request)
 
         request.state.user = None

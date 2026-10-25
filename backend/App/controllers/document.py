@@ -161,12 +161,6 @@ async def cleanDocument(
     if not doc:
         return {"status": 9, "msg": "Document not found."}
 
-    if not os.getenv("GROQ_API_KEY"):
-        return {
-            "status": 0,
-            "msg": "GROQ_API_KEY is missing from environment variables. Please add GROQ_API_KEY to your Vercel Project Settings.",
-        }
-
     # Mark as cleaning in progress
     doc.status = "cleaning"
     db.commit()
