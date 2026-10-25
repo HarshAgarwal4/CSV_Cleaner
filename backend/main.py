@@ -15,19 +15,19 @@ from App.routes.user import userRoutes
 from App.routes.document import documentRoutes
 from middlewares.Auth import AuthMiddleware
 
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     # Connect to Neon Postgres and create tables if not exist
-#     try:
-#         Base.metadata.create_all(bind=engine)
-#         print("Connected to Database successfully")
-#     except Exception as err:
-#         print("Database connection warning (please check DATABASE_URL in .env):", err)
-#     port = os.getenv("PORT", "5000")
-#     print(f"Server is running on port {port}")
-#     yield
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Connect to Neon Postgres and create tables if not exist
+    try:
+        Base.metadata.create_all(bind=engine)
+        print("Connected to Database successfully")
+    except Exception as err:
+        print("Database connection warning (please check DATABASE_URL in .env):", err)
+    port = os.getenv("PORT", "5000")
+    print(f"Server is running on port {port}")
+    yield
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 # CORS configuration
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
