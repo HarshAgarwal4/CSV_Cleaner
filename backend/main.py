@@ -15,17 +15,17 @@ from App.routes.user import userRoutes
 from App.routes.document import documentRoutes
 from middlewares.Auth import AuthMiddleware
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Connect to Neon Postgres and create tables if not exist
-    try:
-        Base.metadata.create_all(bind=engine)
-        print("Connected to Database successfully")
-    except Exception as err:
-        print("Database connection warning (please check DATABASE_URL in .env):", err)
-    port = os.getenv("PORT", "5000")
-    print(f"Server is running on port {port}")
-    yield
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     # Connect to Neon Postgres and create tables if not exist
+#     try:
+#         Base.metadata.create_all(bind=engine)
+#         print("Connected to Database successfully")
+#     except Exception as err:
+#         print("Database connection warning (please check DATABASE_URL in .env):", err)
+#     port = os.getenv("PORT", "5000")
+#     print(f"Server is running on port {port}")
+#     yield
 
 app = FastAPI()
 
@@ -42,11 +42,11 @@ app.add_middleware(
 )
 
 # Auth Middleware (equivalent to app.use(isLoggedIn))
-app.add_middleware(AuthMiddleware)
+# app.add_middleware(AuthMiddleware)
 
 @app.get("/")
 def home():
     return {'msg' : 'Hello world'}
 
-app.include_router(userRoutes)
-app.include_router(documentRoutes)
+# app.include_router(userRoutes)
+# app.include_router(documentRoutes)
