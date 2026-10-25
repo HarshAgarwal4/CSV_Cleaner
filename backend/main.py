@@ -3,23 +3,22 @@ import sys
 from pathlib import Path
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
+
+# Ensure backend root directory and parent are on sys.path for serverless runtimes
+current_dir = Path(__file__).resolve().parent
+if str(current_dir) not in sys.path:
+    sys.path.insert(0, str(current_dir))
+if str(current_dir.parent) not in sys.path:
+    sys.path.insert(0, str(current_dir.parent))
+
+# Load .env file if it exists locally
+load_dotenv()
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-
-# -----------------------------------------------------------------------------
-# 1. Serverless Path & Environment Setup
-# -----------------------------------------------------------------------------
-# Ensure the backend directory is in sys.path regardless of serverless CWD
-BACKEND_DIR = Path(__file__).resolve().parent
-if str(BACKEND_DIR) not in sys.path:
-    sys.path.insert(0, str(BACKEND_DIR))
-
-# Load environment variables
-load_dotenv(dotenv_path=BACKEND_DIR / ".env")
-
 from sqlalchemy import text
+
 from App.models.database import engine, Base
 from App.models.user import UserModel
 from App.models.document import DocumentModel
@@ -27,16 +26,12 @@ from App.routes.user import userRoutes
 from App.routes.document import documentRoutes
 from middlewares.Auth import AuthMiddleware
 
-# -----------------------------------------------------------------------------
-# 2. Resilient Database Initialization (Serverless Cold-Start Safe)
-# -----------------------------------------------------------------------------
-_db_initialized = False
+# Flag to prevent repeated schema migrations on every serverless execution
+_schema_initialized = False
 
-
-def init_db():
-    """Idempotent database schema initialisation safe for serverless cold-starts."""
-    global _db_initialized
-    if _db_initialized:
+def init_database_schema():
+    global _schema_initialized
+    if _schema_initialized:
         return
     try:
         Base.metadata.create_all(bind=engine)
@@ -56,85 +51,69 @@ def init_db():
                 for stmt in stmts:
                     conn.execute(text(stmt))
                 conn.commit()
-        _db_initialized = True
-        print("[DATABASE] Schema verified & tables ready.")
+        _schema_initialized = True
+        print("Connected to Database successfully & schema verified")
     except Exception as err:
-        print("[DATABASE WARNING] Schema verification skipped or failed:", err)
-
+        print("Database connection warning (please check DATABASE_URL):", err)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Run DB schema check on lifespan startup if runtime supports ASGI lifespan
-    init_db()
-    port = os.getenv("PORT", "5000")
-    print(f"[STARTUP] Server initialized (Port: {port} / Serverless ready)")
+    # In local development, verify and migrate database schema
+    is_serverless = bool(os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"))
+    if not is_serverless:
+        init_database_schema()
+    else:
+        # In serverless, skip blocking DDL migrations on cold-start to prevent timeouts
+        print("[SERVERLESS] Serverless runtime detected. Skipping cold-start DDL migrations.")
     yield
 
-
-# -----------------------------------------------------------------------------
-# 3. FastAPI Application Factory
-# -----------------------------------------------------------------------------
 app = FastAPI(
-    title="AI CSV Cleaning & Analytics API",
-    description="Autonomous LangGraph-powered CSV Cleaning, Cloudinary Storage & Analytics API",
-    version="1.0.0",
+    title="AI Data Doctor API",
+    description="Autonomous CSV Cleaning & Analytics Platform",
     lifespan=lifespan,
 )
 
-# -----------------------------------------------------------------------------
-# 4. CORS Configuration (Dynamic for Serverless & Previews)
-# -----------------------------------------------------------------------------
-frontend_env = os.getenv("FRONTEND_URL", "http://localhost:5173")
-# Support comma-separated list of allowed origins
-allowed_origins = [url.strip() for url in frontend_env.split(",") if url.strip()]
-if "http://localhost:5173" not in allowed_origins:
-    allowed_origins.append("http://localhost:5173")
+# CORS configuration
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173").rstrip("/")
+allowed_origins = [
+    frontend_url,
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_origin_regex=r"^https:\/\/.*\.vercel\.app$",  # Allows all Vercel preview branch deployments
+    allow_origins=list(set([o for o in allowed_origins if o])),
+    allow_origin_regex=r"https?://.*\.vercel\.app",  # Automatically permit all Vercel deployments & previews
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# -----------------------------------------------------------------------------
-# 5. Middlewares & Routing
-# -----------------------------------------------------------------------------
+# Auth Middleware (equivalent to app.use(isLoggedIn))
 app.add_middleware(AuthMiddleware)
-
 
 @app.get("/")
 def home():
     return {
-        "status": "online",
-        "service": "AI CSV Cleaner & Analytics API",
-        "architecture": "serverless-compatible",
+        "status": "ok",
+        "message": "AI Data Doctor API is running successfully",
+        "environment": "serverless" if os.getenv("VERCEL") else "local",
     }
-
 
 @app.get("/health")
 def health_check():
-    """Fast, lightweight health check endpoint for serverless keepalive & monitoring."""
-    return {"status": "healthy", "database_ready": _db_initialized}
-
+    return {"status": "healthy"}
 
 app.include_router(userRoutes)
 app.include_router(documentRoutes)
 
-# -----------------------------------------------------------------------------
-# 6. Serverless ASGI Handlers (AWS Lambda / Vercel / Netlify / Standalone)
-# -----------------------------------------------------------------------------
-try:
-    from mangum import Mangum
-    # AWS Lambda / Netlify serverless handler
-    handler = Mangum(app, lifespan="auto")
-except ImportError:
-    handler = app
+# Serverless entrypoint compatibility (for Vercel @vercel/python / Mangum)
+handler = app
 
-# For local direct execution: python main.py
 if __name__ == "__main__":
-    init_db()
-    port = int(os.getenv("PORT", "5000"))
+    port = int(os.getenv("PORT", 5000))
+    print(f"Server is running on port {port}")
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

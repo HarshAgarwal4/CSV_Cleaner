@@ -34,7 +34,9 @@ FINAL_OUTPUT_FILE = "cleaned_data.csv"
 
 api_key = os.getenv("GROQ_API_KEY")
 if not api_key:
-    raise ValueError("GROQ_API_KEY is missing from the .env file")
+    # Use a dummy placeholder for module import to prevent serverless invocation crashes
+    print("[AI WARNING] GROQ_API_KEY is not configured in environment. AI cleaning will require this key.")
+    api_key = "placeholder_groq_api_key"
 
 llm = ChatGroq(
     model="openai/gpt-oss-120b",

@@ -1,6 +1,5 @@
 fastapi
 uvicorn[standard]
-mangum
 bcrypt
 python-jose[cryptography]
 python-multipart
