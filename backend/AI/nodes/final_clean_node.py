@@ -1,4 +1,5 @@
 import os
+import tempfile
 import pandas as pd
 
 from AI.agent import State, ORIGINAL_OUTPUT_FILE, FINAL_OUTPUT_FILE
@@ -35,9 +36,13 @@ def clean_complete_csv(state: State) -> dict:
     # Call row-level cleaning function from manual_row.py
     df = clean_dataset(df, rules)
 
-    # File paths for saving separate files
-    original_output_path = os.path.abspath(ORIGINAL_OUTPUT_FILE)
-    cleaned_output_path = os.path.abspath(FINAL_OUTPUT_FILE)
+    # File paths for saving separate files in the system's writable temp directory
+    # (Resolves [Errno 30] Read-only file system in serverless platforms like Vercel / AWS Lambda)
+    temp_dir = tempfile.gettempdir()
+    orig_name = os.path.basename(ORIGINAL_OUTPUT_FILE) if ORIGINAL_OUTPUT_FILE else "original_data.csv"
+    clean_name = os.path.basename(FINAL_OUTPUT_FILE) if FINAL_OUTPUT_FILE else "cleaned_data.csv"
+    original_output_path = os.path.join(temp_dir, orig_name)
+    cleaned_output_path = os.path.join(temp_dir, clean_name)
 
     # Save original raw CSV
     raw_df.to_csv(
@@ -117,4 +122,3 @@ def clean_complete_csv(state: State) -> dict:
         },
         "cleaning_report": report,
     }
-

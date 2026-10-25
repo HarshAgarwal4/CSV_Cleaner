@@ -533,7 +533,7 @@ You are an expert categorical data-cleaning engineer.
 
 Column name: {col_name}
 
-Demo Data: {df.head()}
+Sample column values: {cleaned.dropna().head(10).tolist()}
 
 Observed unique values:
 {unique_values}

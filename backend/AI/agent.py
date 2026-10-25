@@ -27,10 +27,13 @@ if __name__ == "__main__":
 backend_env = backend_dir / ".env"
 load_dotenv(dotenv_path=backend_env if backend_env.exists() else None)
 
+import tempfile
+
+TEMP_DIR = tempfile.gettempdir()
 MAX_RETRIES = 3
-ORIGINAL_OUTPUT_FILE = "original_data.csv"
-OUTPUT_FILE = "cleaned_data.csv"
-FINAL_OUTPUT_FILE = "cleaned_data.csv"
+ORIGINAL_OUTPUT_FILE = os.path.join(TEMP_DIR, "original_data.csv")
+OUTPUT_FILE = os.path.join(TEMP_DIR, "cleaned_data.csv")
+FINAL_OUTPUT_FILE = os.path.join(TEMP_DIR, "cleaned_data.csv")
 
 api_key = os.getenv("GROQ_API_KEY")
 if not api_key:
