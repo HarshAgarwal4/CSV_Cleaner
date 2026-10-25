@@ -8,3 +8,5 @@ wheels/
 
 # Virtual environments
 .venv
+original_data.csv
+cleaned_data.csv

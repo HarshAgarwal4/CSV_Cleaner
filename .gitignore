@@ -25,3 +25,6 @@ dist-ssr
 .env
 .venv
 __pychache__
+original_data.csv
+cleaned_data.csv
+dev.db

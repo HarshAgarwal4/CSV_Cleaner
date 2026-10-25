@@ -8,8 +8,12 @@ from fastapi.responses import PlainTextResponse
 
 load_dotenv()
 
+from sqlalchemy import text
 from App.models.database import engine, Base
+from App.models.user import UserModel
+from App.models.document import DocumentModel
 from App.routes.user import userRoutes
+from App.routes.document import documentRoutes
 from middlewares.Auth import AuthMiddleware
 
 @asynccontextmanager
@@ -17,7 +21,23 @@ async def lifespan(app: FastAPI):
     # Connect to Neon Postgres and create tables if not exist
     try:
         Base.metadata.create_all(bind=engine)
-        print("Connected to Database successfully")
+        if engine.dialect.name == "postgresql":
+            with engine.connect() as conn:
+                stmts = [
+                    "ALTER TABLE documents ADD COLUMN IF NOT EXISTS cleaned_file_url VARCHAR;",
+                    "ALTER TABLE documents ADD COLUMN IF NOT EXISTS cleaned_public_id VARCHAR;",
+                    "ALTER TABLE documents ADD COLUMN IF NOT EXISTS cleaned_file_size INTEGER DEFAULT 0;",
+                    "ALTER TABLE documents ADD COLUMN IF NOT EXISTS cleaned_row_count INTEGER DEFAULT 0;",
+                    "ALTER TABLE documents ADD COLUMN IF NOT EXISTS initial_analysis JSON DEFAULT '{}'::json;",
+                    "ALTER TABLE documents ADD COLUMN IF NOT EXISTS final_analysis JSON DEFAULT '{}'::json;",
+                    "ALTER TABLE documents ADD COLUMN IF NOT EXISTS review JSON DEFAULT '{}'::json;",
+                    "ALTER TABLE documents ADD COLUMN IF NOT EXISTS cleaning_error VARCHAR;",
+                    "ALTER TABLE documents ADD COLUMN IF NOT EXISTS cleaned_at TIMESTAMP WITHOUT TIME ZONE;",
+                ]
+                for stmt in stmts:
+                    conn.execute(text(stmt))
+                conn.commit()
+        print("Connected to Database successfully & schema verified")
     except Exception as err:
         print("Database connection warning (please check DATABASE_URL in .env):", err)
     port = os.getenv("PORT", "5000")
@@ -46,6 +66,7 @@ def home():
     return PlainTextResponse("Hello World")
 
 app.include_router(userRoutes)
+app.include_router(documentRoutes)
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
