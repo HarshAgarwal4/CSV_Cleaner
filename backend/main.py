@@ -42,11 +42,11 @@ app.add_middleware(
 )
 
 # Auth Middleware (equivalent to app.use(isLoggedIn))
-# app.add_middleware(AuthMiddleware)
+app.add_middleware(AuthMiddleware)
 
 @app.get("/")
 def home():
     return {'msg' : 'Hello world'}
 
-# app.include_router(userRoutes)
-# app.include_router(documentRoutes)
+app.include_router(userRoutes)
+app.include_router(documentRoutes)
