@@ -18,7 +18,6 @@ from middlewares.Auth import AuthMiddleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Connect to Neon Postgres and create tables if not exist
     try:
         Base.metadata.create_all(bind=engine)
         if engine.dialect.name == "postgresql":
@@ -44,7 +43,8 @@ async def lifespan(app: FastAPI):
     print(f"Server is running on port {port}")
     yield
 
-app = FastAPI(lifespan=lifespan)
+# app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 # CORS configuration
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
@@ -59,7 +59,7 @@ app.add_middleware(
 )
 
 # Auth Middleware (equivalent to app.use(isLoggedIn))
-app.add_middleware(AuthMiddleware)
+# app.add_middleware(AuthMiddleware)
 
 @app.get("/")
 def home():
