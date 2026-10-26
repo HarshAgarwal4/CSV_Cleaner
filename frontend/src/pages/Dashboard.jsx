@@ -113,10 +113,10 @@ const Dashboard = () => {
                 setFile(selected);
                 setHeaders(detectedHeaders);
                 setRawRows(previewRows);
-                toast.success(`Validated "${selected.name}" with Papa Parse (${detectedHeaders.length} columns)`);
+                toast.success(`Validated "${selected.name}" with Parse (${detectedHeaders.length} columns)`);
             },
             error: (err) => {
-                toast.error(`Papa Parse error reading file: ${err.message}`);
+                toast.error(`Parse error reading file: ${err.message}`);
                 handleClearFile();
             },
         });
@@ -428,7 +428,7 @@ const Dashboard = () => {
                                     My Documents Hub
                                 </h1>
                                 <p className="mt-1 text-sm text-slate-500">
-                                    Inspect your CSV spreadsheets, launch AI cleaning, and compare datasets with Papa Parse.
+                                    Inspect your CSV spreadsheets, launch AI cleaning, and compare datasets with Parse.
                                 </p>
                             </div>
                             <div className="flex items-center gap-3">
@@ -680,10 +680,10 @@ const Dashboard = () => {
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div>
                                 <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                                    Upload & Clean CSV (Papa Parse)
+                                    Upload & Clean CSV
                                 </h1>
                                 <p className="mt-1 text-sm text-slate-500">
-                                    Validated client-side with Papa Parse, stored on Cloudinary, and cleaned automatically with AI.
+                                    Validated client-side with Parse, stored on Cloudinary, and cleaned automatically with AI.
                                 </p>
                             </div>
                             {file && (
@@ -719,7 +719,7 @@ const Dashboard = () => {
                                     Click to upload or drag & drop CSV file
                                 </h3>
                                 <p className="text-xs text-slate-500 max-w-sm mb-4">
-                                    Parsed directly with Papa Parse before streaming to Cloudinary
+                                    Parsed directly with Parse before streaming to Cloudinary
                                 </p>
                                 <span className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20">
                                     Browse .CSV File
@@ -739,7 +739,7 @@ const Dashboard = () => {
                                             <div className="flex items-center gap-2">
                                                 <h3 className="font-bold text-slate-900 text-base">{file.name}</h3>
                                                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                    PAPA PARSE VERIFIED
+                                                    PARSE VERIFIED
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
@@ -804,7 +804,7 @@ const Dashboard = () => {
                                 <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
                                     <div className="p-4 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between">
                                         <span className="text-xs font-semibold text-slate-700">
-                                            Papa Parse Sample Preview (First {rawRows.length} Rows)
+                                            Parse Sample Preview (First {rawRows.length} Rows)
                                         </span>
                                     </div>
 

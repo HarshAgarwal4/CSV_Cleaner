@@ -152,7 +152,7 @@ const CsvComparisonModal = ({ doc, onClose }) => {
                                 </span>
                             </div>
                             <p className="text-xs text-slate-500 mt-0.5">
-                                Powered by Papa Parse client streaming • Files securely hosted on Cloudinary
+                                Powered by Parse client streaming • Files securely hosted on Cloudinary
                             </p>
                         </div>
                     </div>
@@ -211,7 +211,7 @@ const CsvComparisonModal = ({ doc, onClose }) => {
                             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                             </svg>
-                            Papa Parse CSV Comparison ({rawRows.length > 0 ? `${rawRows.length} vs ${cleanedRows.length}` : 'Live Grid'})
+                            Parse CSV Comparison ({rawRows.length > 0 ? `${rawRows.length} vs ${cleanedRows.length}` : 'Live Grid'})
                         </button>
 
                         <button
@@ -533,7 +533,7 @@ const CsvComparisonModal = ({ doc, onClose }) => {
                                 <div className="p-8 bg-slate-50 rounded-2xl border border-slate-200 text-center">
                                     <div className="w-7 h-7 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
                                     <p className="text-xs text-slate-600 font-medium">
-                                        Papa Parse is streaming & parsing CSV files directly from Cloudinary...
+                                        Parse is streaming & parsing CSV files directly from Cloudinary...
                                     </p>
                                 </div>
                             )}
